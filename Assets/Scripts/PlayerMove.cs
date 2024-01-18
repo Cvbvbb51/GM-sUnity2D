@@ -91,7 +91,39 @@ public class PlayerMove : MonoBehaviour
 
 
     }
+    private void OnCollisionEnter2D(Collision2D collision) //두 개의 Collider2D가 충돌했을 때 호출되는 이벤트 
+    {
+        if (collision.gameObject.tag == "Enemy")
+        {
+            OnDamaged(collision.transform.position);
+        }
+    }
 
+    void OnDamaged(Vector2 targetPos)
+    {
+        //Change Layer (Immortal Active)
+        gameObject.layer = 11;
+
+        //View Alpha
+        spriteRenderer.color = new Color(1, 1, 1, 0.4f); //마지막 인자는 투명도
+
+        //Reaction Force (피격시 넉백)
+        int dirc = transform.position.x - targetPos.x > 0 ? 1 : -1;
+        rigid.AddForce(new Vector2(dirc, 1) * 7, ForceMode2D.Impulse);
+
+
+        //Animation
+        anim.SetTrigger("doDamaged");
+        Invoke("OffDamaged", 1);
+
+    }
+
+    void OffDamaged() //무적 해제 함수 생성
+    {
+        gameObject.layer = 10;
+        spriteRenderer.color = new Color(1, 1, 1, 1);
+
+    }
 
 
 }
